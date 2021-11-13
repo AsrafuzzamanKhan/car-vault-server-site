@@ -41,7 +41,7 @@ async function run() {
 
 
         app.get('/homeCars', async (req, res) => {
-            const cursor = carsCollection.find({}).limit(6)
+            const cursor = carsCollection.find({}).limit(6);
             const result = await cursor.toArray();
             res.json(result)
         })
@@ -83,6 +83,12 @@ async function run() {
             res.json(result);
         });
 
+        app.get('/allOrders', async (req, res) => {
+            const cursor = bookingsCollection.find({});
+            const result = await cursor.toArray();
+            res.json(result)
+        })
+
         // get personal booking 
         app.get('/bookingCar', async (req, res) => {
             const email = req.query.email;
@@ -104,12 +110,55 @@ async function run() {
             const result = await bookingsCollection.deleteOne(query);
             res.json(result);
         });
+
+        // verify admin 
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.role === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin })
+        });
+
         // add user
-        app.post('/registerUser', async (req, res) => {
+        app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
             res.json(result);
         });
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+        });
+
+        app.put('/users/admin', async (req, res) => {
+            const user = req.body;
+            console.log('jjj', user)
+            const filter = { email: user.email };
+            const updateDoc = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.json(result);
+        });
+        // Approve booking 
+        // app.put("/manageAllBooking/:id", async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) };
+        //     const option = { upsert: true };
+        //     const updateDoc = {
+        //         $set: {
+        //             status: "Approved"
+        //         }
+        //     }
+        //     const result = await bookingCollection.updateOne(query, updateDoc, option)
+        //     res.send(result);
+        // });
 
     } finally {
         //   await client.close();
