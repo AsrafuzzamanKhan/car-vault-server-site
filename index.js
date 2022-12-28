@@ -168,7 +168,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Hello World 2022');
+  res.send('Hello World-2022');
 });
 
 app.listen(port, () => {
