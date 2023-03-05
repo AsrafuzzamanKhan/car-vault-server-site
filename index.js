@@ -142,7 +142,7 @@ async function run() {
 
     app.put('/users/admin', async (req, res) => {
       const user = req.body;
-      console.log('jjj', user);
+      console.log('User: ', user);
       const filter = { email: user.email };
       const updateDoc = { $set: { role: 'admin' } };
       const result = await usersCollection.updateOne(filter, updateDoc);
@@ -168,7 +168,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Hello World-2022');
+  res.send('Hello World-2023');
 });
 
 app.listen(port, () => {
